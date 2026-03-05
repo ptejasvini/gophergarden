@@ -3,7 +3,10 @@ let problems = [];
 let currentFilter = { search: '', difficulty: '' };
 
 // Detect base path for GitHub Pages vs local development
-const basePath = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+const basePath = (window.location.protocol === 'file:' || 
+                  window.location.hostname === 'localhost' || 
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.hostname.includes('localhost'))
     ? '' 
     : '/gophergarden';
 
