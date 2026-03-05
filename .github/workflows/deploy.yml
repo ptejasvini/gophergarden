@@ -30,7 +30,7 @@ jobs:
       - name: Build site
         run: |
           mkdir -p _site
-          rsync -avL --exclude='_site' . _site/
+          rsync -av --exclude='_site' --exclude='.git' --exclude='.gitignore' --exclude='node_modules' . _site/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
