@@ -27,7 +27,7 @@ async function loadProblems() {
 
     for (const name of problemNames) {
         try {
-            const response = await fetch(`/content/${name}.md`);
+            const response = await fetch(`content/${name}.md`);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
@@ -200,7 +200,7 @@ async function loadProblem(name) {
         document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
 
         // Fetch and render Go code
-        const codeResponse = await fetch(`/solutions/${name}.go`);
+        const codeResponse = await fetch(`solutions/${name}.go`);
         if (!codeResponse.ok) {
             throw new Error(`Failed to fetch code: ${codeResponse.status}`);
         }
