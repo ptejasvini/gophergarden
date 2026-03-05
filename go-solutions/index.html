@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gopher Garden - Go Solutions</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Gopher Garden</h1>
+        <div class="controls">
+            <input type="text" id="search" placeholder="Search problems...">
+            <select id="difficulty">
+                <option value="">All Difficulties</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+            </select>
+            <button id="dark-mode-toggle">Toggle Dark Mode</button>
+        </div>
+    </header>
+    <main>
+        <div id="problems-container" class="problems-grid">
+            <!-- Problem cards will be generated here -->
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
