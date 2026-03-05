@@ -30,13 +30,17 @@ jobs:
       - name: Build site
         run: |
           mkdir -p _site
-          rsync -av --exclude='_site' --exclude='.git' --exclude='.gitignore' --exclude='node_modules' . _site/
+          find . -maxdepth 1 -type f \( -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.md" \) -exec cp {} _site/ \;
+          mkdir -p _site/content _site/solutions _site/.github
+          cp -r content/* _site/content/ 2>/dev/null || true
+          cp -r solutions/* _site/solutions/ 2>/dev/null || true
+          cp -r .github/workflows _site/.github/ 2>/dev/null || true
+          touch _site/.nojekyll
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
-          path: _site/
+          path: '_site'
 
       - name: Deploy to GitHub Pages
         id: deployment
