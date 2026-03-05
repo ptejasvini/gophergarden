@@ -7,6 +7,10 @@ const basePath = (window.location.hostname.includes('github.io'))
     ? '/gophergarden'
     : '';
 
+console.log('Hostname:', window.location.hostname);
+console.log('BasePath:', basePath);
+console.log('Full URL:', window.location.href);
+
 // Check which page we're on
 const isIndexPage = document.getElementById('problems-container') !== null;
 const isProblemPage = document.getElementById('markdown-content') !== null;
