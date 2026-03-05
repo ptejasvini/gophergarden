@@ -14,7 +14,7 @@ A fully static website for displaying Go (Golang) coding problem solutions. Buil
 ## Folder Structure
 
 ```
-go-solutions/
+/
 │
 ├── solutions/          # Go solution files (.go)
 ├── content/            # Problem descriptions (.md with frontmatter)
@@ -82,7 +82,7 @@ Everything after the second `---` is the problem description, which will be rend
 
 1. **Repository Setup**:
    - Create a GitHub repository named `gophergarden`
-   - Push the `go-solutions/` folder contents to the root of the repository
+   - The static site files are already in the root of the repository
 
 2. **Enable GitHub Pages**:
    - Go to repository Settings → Pages
