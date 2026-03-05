@@ -3,12 +3,13 @@ let problems = [];
 let currentFilter = { search: '', difficulty: '' };
 
 // Detect base path for GitHub Pages vs local development
-const basePath = (window.location.protocol === 'file:' || 
-                  window.location.hostname === 'localhost' || 
-                  window.location.hostname === '127.0.0.1' ||
-                  window.location.hostname.includes('localhost'))
-    ? '' 
-    : '/gophergarden';
+const basePath = (window.location.hostname.includes('github.io'))
+    ? '/gophergarden'
+    : '';
+
+console.log('Protocol:', window.location.protocol);
+console.log('Hostname:', window.location.hostname);
+console.log('BasePath:', basePath);
 
 // Check which page we're on
 const isIndexPage = document.getElementById('problems-container') !== null;
