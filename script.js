@@ -32,21 +32,27 @@ function initIndexPage() {
 // Load problems from markdown files
 async function loadProblems() {
     // Fetch problem list from config file
-    const configResponse = await fetch(`${basePath}/config/problems.json`);
+    const configUrl = `${basePath}/config/problems.json`;
+    console.log('Fetching config from:', configUrl);
+    const configResponse = await fetch(configUrl);
     if (!configResponse.ok) {
         throw new Error(`Failed to load problems config: ${configResponse.status}`);
     }
     const config = await configResponse.json();
+    console.log('Config:', config);
     const problemNames = config.problems;
 
     for (const name of problemNames) {
         try {
-            const response = await fetch(`${basePath}/content/${name}.md`);
+            const mdUrl = `${basePath}/content/${name}.md`;
+            console.log('Fetching markdown from:', mdUrl);
+            const response = await fetch(mdUrl);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             const text = await response.text();
             const frontmatter = parseFrontmatter(text);
+            console.log('Parsed frontmatter for', name, ':', frontmatter);
             if (frontmatter.title) {
                 problems.push({
                     name,
@@ -60,6 +66,7 @@ async function loadProblems() {
         }
     }
 
+    console.log('All problems loaded:', problems);
     generateCards();
 }
 
