@@ -30,12 +30,16 @@ jobs:
       - name: Build site
         run: |
           mkdir -p _site
-          find . -maxdepth 1 -type f \( -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.md" \) -exec cp {} _site/ \;
-          mkdir -p _site/content _site/solutions _site/.github
-          cp -r content/* _site/content/ 2>/dev/null || true
-          cp -r solutions/* _site/solutions/ 2>/dev/null || true
-          cp -r .github/workflows _site/.github/ 2>/dev/null || true
+          # Copy root HTML, CSS, JS files
+          cp *.html *.css *.js _site/
+          # Copy content and solutions directories
+          cp -r content _site/
+          cp -r solutions _site/
+          # Create .nojekyll for GitHub Pages
           touch _site/.nojekyll
+          # List what we're deploying
+          echo "Files in _site:"
+          ls -la _site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
