@@ -181,7 +181,7 @@ function initProblemPage() {
 async function loadProblem(name) {
     try {
         // Fetch markdown content
-        const mdResponse = await fetch(`/content/${name}.md`);
+        const mdResponse = await fetch(`${basePath}/content/${name}.md`);
         if (!mdResponse.ok) {
             throw new Error(`Failed to fetch markdown: ${mdResponse.status}`);
         }
