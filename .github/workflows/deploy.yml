@@ -30,8 +30,7 @@ jobs:
       - name: Build site
         run: |
           mkdir -p _site
-          cp -r * _site/
-          cp -r .git* _site/ 2>/dev/null || true
+          rsync -av --exclude='_site' . _site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
