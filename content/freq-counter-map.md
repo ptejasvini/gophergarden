@@ -1,5 +1,4 @@
 ---
----
 title: Frequency Map Counter
 difficulty: Easy
 tags: Math
