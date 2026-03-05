@@ -2,15 +2,6 @@
 let problems = [];
 let currentFilter = { search: '', difficulty: '' };
 
-// Detect base path for GitHub Pages vs local development
-const basePath = (window.location.hostname.includes('github.io'))
-    ? '/gophergarden'
-    : '';
-
-console.log('Hostname:', window.location.hostname);
-console.log('BasePath:', basePath);
-console.log('Full URL:', window.location.href);
-
 // Check which page we're on
 const isIndexPage = document.getElementById('problems-container') !== null;
 const isProblemPage = document.getElementById('markdown-content') !== null;
@@ -31,8 +22,8 @@ function initIndexPage() {
 
 // Load problems from markdown files
 async function loadProblems() {
-    // Fetch problem list from config file
-    const configUrl = `${basePath}/config/problems.json`;
+    // Fetch problem list from config file (use relative path)
+    const configUrl = `config/problems.json`;
     const configResponse = await fetch(configUrl);
     if (!configResponse.ok) {
         throw new Error(`Failed to load problems config: ${configResponse.status}`);
@@ -42,7 +33,7 @@ async function loadProblems() {
 
     for (const name of problemNames) {
         try {
-            const mdUrl = `${basePath}/content/${name}.md`;
+            const mdUrl = `content/${name}.md`;
             const response = await fetch(mdUrl);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
@@ -192,7 +183,7 @@ function initProblemPage() {
 async function loadProblem(name) {
     try {
         // Fetch markdown content
-        const mdResponse = await fetch(`${basePath}/content/${name}.md`);
+        const mdResponse = await fetch(`content/${name}.md`);
         if (!mdResponse.ok) {
             throw new Error(`Failed to fetch markdown: ${mdResponse.status}`);
         }
@@ -216,7 +207,7 @@ async function loadProblem(name) {
         document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
 
         // Fetch and render Go code
-        const codeResponse = await fetch(`${basePath}/solutions/${name}.go`);
+        const codeResponse = await fetch(`solutions/${name}.go`);
         if (!codeResponse.ok) {
             throw new Error(`Failed to fetch code: ${codeResponse.status}`);
         }
