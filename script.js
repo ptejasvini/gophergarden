@@ -27,8 +27,13 @@ function initIndexPage() {
 
 // Load problems from markdown files
 async function loadProblems() {
-    // Hardcoded list of problem names (in a real app, this could be generated or from a config)
-    const problemNames = ['two-sum', 'swap-without-temp'];
+    // Fetch problem list from config file
+    const configResponse = await fetch(`${basePath}/config/problems.json`);
+    if (!configResponse.ok) {
+        throw new Error(`Failed to load problems config: ${configResponse.status}`);
+    }
+    const config = await configResponse.json();
+    const problemNames = config.problems;
 
     for (const name of problemNames) {
         try {
