@@ -23,7 +23,7 @@ function initIndexPage() {
 // Load problems from markdown files
 async function loadProblems() {
     // Hardcoded list of problem names (in a real app, this could be generated or from a config)
-    const problemNames = ['two-sum'];
+    const problemNames = ['two-sum', 'swap-without-temp'];
 
     for (const name of problemNames) {
         try {
