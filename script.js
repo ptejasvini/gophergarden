@@ -2,6 +2,11 @@
 let problems = [];
 let currentFilter = { search: '', difficulty: '' };
 
+// Detect base path for GitHub Pages vs local development
+const basePath = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? '' 
+    : '/gophergarden';
+
 // Check which page we're on
 const isIndexPage = document.getElementById('problems-container') !== null;
 const isProblemPage = document.getElementById('markdown-content') !== null;
@@ -27,7 +32,7 @@ async function loadProblems() {
 
     for (const name of problemNames) {
         try {
-            const response = await fetch(`content/${name}.md`);
+            const response = await fetch(`${basePath}/content/${name}.md`);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
@@ -200,7 +205,7 @@ async function loadProblem(name) {
         document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
 
         // Fetch and render Go code
-        const codeResponse = await fetch(`solutions/${name}.go`);
+        const codeResponse = await fetch(`${basePath}/solutions/${name}.go`);
         if (!codeResponse.ok) {
             throw new Error(`Failed to fetch code: ${codeResponse.status}`);
         }
