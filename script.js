@@ -2,6 +2,9 @@
 let problems = [];
 let currentFilter = { search: '', difficulty: '' };
 
+// Base path for GitHub Pages compatibility
+const BASE_PATH = './'; // Adjust if using a subfolder
+
 // Check which page we're on
 const isIndexPage = document.getElementById('problems-container') !== null;
 const isProblemPage = document.getElementById('markdown-content') !== null;
@@ -42,8 +45,7 @@ function showLoadError(error) {
 
 // Load problems from markdown files
 async function loadProblems() {
-    // Fetch problem list from config file (use relative path)
-    const configUrl = `config/problems.json`;
+    const configUrl = `${BASE_PATH}config/problems.json`;
     const configResponse = await fetch(configUrl);
     if (!configResponse.ok) {
         throw new Error(`Failed to load problems config: ${configResponse.status}`);
@@ -53,7 +55,7 @@ async function loadProblems() {
 
     for (const name of problemNames) {
         try {
-            const mdUrl = `content/${name}.md`;
+            const mdUrl = `${BASE_PATH}content/${name}.md`;
             const response = await fetch(mdUrl);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
@@ -94,7 +96,6 @@ function parseFrontmatter(text) {
             let value = line.substring(colonIndex + 1).trim();
 
             if (key === 'tags') {
-                // Parse tags array
                 value = value.replace(/[\[\]]/g, '').split(',').map(tag => tag.trim());
             }
 
@@ -136,7 +137,6 @@ function generateCards() {
         container.appendChild(card);
     });
 
-    // Apply current filters
     filterCards();
 }
 
@@ -180,13 +180,11 @@ function filterCards() {
 function setupDarkMode() {
     const toggle = document.getElementById('dark-mode-toggle');
 
-    // Load saved theme
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') {
         document.body.classList.add('light');
     }
 
-    // Toggle event
     toggle.addEventListener('click', () => {
         document.body.classList.toggle('light');
         const currentTheme = document.body.classList.contains('light') ? 'light' : 'dark';
@@ -194,7 +192,7 @@ function setupDarkMode() {
     });
 }
 
-// Placeholder for problem page (to be implemented in Phase 5)
+// Problem page initialization
 function initProblemPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const problemName = urlParams.get('name');
@@ -212,17 +210,12 @@ function initProblemPage() {
 // Load and render problem content
 async function loadProblem(name) {
     try {
-        // Fetch markdown content
-        const mdResponse = await fetch(`content/${name}.md`);
-        if (!mdResponse.ok) {
-            throw new Error(`Failed to fetch markdown: ${mdResponse.status}`);
-        }
+        const mdResponse = await fetch(`${BASE_PATH}content/${name}.md`);
+        if (!mdResponse.ok) throw new Error(`Failed to fetch markdown: ${mdResponse.status}`);
         const mdText = await mdResponse.text();
 
-        // Parse frontmatter
         const frontmatter = parseFrontmatter(mdText);
 
-        // Update page elements
         document.getElementById('problem-title').textContent = frontmatter.title || 'Untitled Problem';
         const difficultyEl = document.getElementById('difficulty');
         difficultyEl.textContent = frontmatter.difficulty || '';
@@ -231,23 +224,18 @@ async function loadProblem(name) {
         const tagsContainer = document.getElementById('tags');
         tagsContainer.innerHTML = (frontmatter.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('');
 
-        // Extract and render markdown content (after frontmatter)
         const contentStartIndex = mdText.indexOf('---', mdText.indexOf('---') + 1) + 3;
         const markdownContent = mdText.substring(contentStartIndex).trim();
         document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
 
-        // Fetch and render Go code
-        const codeResponse = await fetch(`solutions/${name}.go`);
-        if (!codeResponse.ok) {
-            throw new Error(`Failed to fetch code: ${codeResponse.status}`);
-        }
+        const codeResponse = await fetch(`${BASE_PATH}solutions/${name}.go`);
+        if (!codeResponse.ok) throw new Error(`Failed to fetch code: ${codeResponse.status}`);
         const codeText = await codeResponse.text();
 
         const codeBlock = document.getElementById('code-block');
         codeBlock.textContent = codeText;
         codeBlock.className = 'language-go';
 
-        // Highlight code with Prism
         Prism.highlightElement(codeBlock);
 
     } catch (error) {
@@ -257,7 +245,7 @@ async function loadProblem(name) {
     }
 }
 
-// Setup back button
+// Back button
 function setupBackButton() {
     const backButton = document.getElementById('back-button');
     backButton.addEventListener('click', () => {
@@ -265,7 +253,7 @@ function setupBackButton() {
     });
 }
 
-// Setup copy to clipboard button
+// Copy to clipboard
 function setupCopyButton() {
     const copyButton = document.getElementById('copy-button');
     copyButton.addEventListener('click', async () => {
@@ -274,7 +262,6 @@ function setupCopyButton() {
 
         try {
             await navigator.clipboard.writeText(code);
-            // Provide user feedback
             const originalText = copyButton.textContent;
             copyButton.textContent = 'Copied!';
             copyButton.disabled = true;
@@ -284,7 +271,6 @@ function setupCopyButton() {
             }, 2000);
         } catch (error) {
             console.error('Failed to copy code:', error);
-            // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = code;
             document.body.appendChild(textArea);
