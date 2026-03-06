@@ -3,7 +3,7 @@
     "freq-counter-map",
     "swap-without-temp",
     "two-sum",
-    "goroutine_print_numbers",
-    "waitgroup_multiple_goroutines"
+    "goroutine-print-numbers",
+    "waitgroup-multiple-goroutines"
   ]
 }
