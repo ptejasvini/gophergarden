@@ -27,6 +27,20 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Generate problems.json automatically
+        run: |
+          mkdir -p config
+          echo '{"problems": [' > config/problems.json
+          for f in content/*.md; do
+            name=$(basename "$f" .md)
+            echo "\"$name\"," >> config/problems.json
+          done
+          # Remove last comma and close JSON
+          sed -i '$ s/,$//' config/problems.json
+          echo ']}' >> config/problems.json
+          echo "Generated config/problems.json:"
+          cat config/problems.json
+
       - name: Build site
         run: |
           mkdir -p _site

@@ -1,7 +1,7 @@
 ---
 title: Frequency Map Counter
 difficulty: Easy
-tags: Math
+tags: [goroutine]
 ---
 
 ## Problem Description

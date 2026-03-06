@@ -1,19 +1,23 @@
+// ==============================
 // Global variables
+// ==============================
 let problems = [];
 let currentFilter = { search: '', difficulty: '' };
 
+// ==============================
 // Detect base path dynamically
-const BASE_PATH = (function() {
-    const pathParts = window.location.pathname.split('/');
-    // If running on GitHub Pages (repo path included), use first 2 parts: ['', 'repo-name', ...]
+// ==============================
+const BASE_PATH = (() => {
     if (window.location.hostname.includes('github.io')) {
-        return `/${pathParts[1]}/`;
+        const parts = window.location.pathname.split('/');
+        return `/${parts[1]}/`; // repo name for GitHub Pages
     }
-    // Otherwise, local server or root domain
-    return './';
+    return './'; // local server or root domain
 })();
 
-// Check which page we're on
+// ==============================
+// Page type detection
+// ==============================
 const isIndexPage = document.getElementById('problems-container') !== null;
 const isProblemPage = document.getElementById('markdown-content') !== null;
 
@@ -24,7 +28,9 @@ if (isIndexPage) {
     initProblemPage();
 }
 
-// Index page initialization
+// ==============================
+// INDEX PAGE FUNCTIONS
+// ==============================
 async function initIndexPage() {
     try {
         await loadProblems();
@@ -51,42 +57,40 @@ function showLoadError(error) {
     `;
 }
 
-// Load problems from markdown files
+// ==============================
+// Load problems dynamically
+// ==============================
 async function loadProblems() {
+    // Fetch the file list from GitHub Pages workflow-generated JSON
     const configUrl = `${BASE_PATH}config/problems.json`;
     const configResponse = await fetch(configUrl);
-    if (!configResponse.ok) {
-        throw new Error(`Failed to load problems config: ${configResponse.status}`);
-    }
+    if (!configResponse.ok) throw new Error(`Failed to load problems JSON: ${configResponse.status}`);
     const config = await configResponse.json();
     const problemNames = config.problems;
 
     for (const name of problemNames) {
         try {
-            const mdUrl = `${BASE_PATH}content/${name}.md`;
-            const response = await fetch(mdUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            const text = await response.text();
-            const frontmatter = parseFrontmatter(text);
-            if (frontmatter.title) {
-                problems.push({
-                    name,
-                    title: frontmatter.title,
-                    difficulty: frontmatter.difficulty,
-                    tags: frontmatter.tags || []
-                });
-            }
-        } catch (error) {
-            console.error(`Failed to load problem ${name}:`, error);
+            const mdResponse = await fetch(`${BASE_PATH}content/${name}.md`);
+            if (!mdResponse.ok) continue;
+            const mdText = await mdResponse.text();
+            const frontmatter = parseFrontmatter(mdText);
+            problems.push({
+                name,
+                title: frontmatter.title || name,
+                difficulty: frontmatter.difficulty || '',
+                tags: frontmatter.tags || []
+            });
+        } catch (err) {
+            console.error(`Failed to load problem ${name}:`, err);
         }
     }
 
     generateCards();
 }
 
-// Parse frontmatter manually (simple YAML parser)
+// ==============================
+// Parse YAML frontmatter
+// ==============================
 function parseFrontmatter(text) {
     const lines = text.split('\n');
     if (lines[0] !== '---') return {};
@@ -114,7 +118,9 @@ function parseFrontmatter(text) {
     return data;
 }
 
+// ==============================
 // Generate problem cards
+// ==============================
 function generateCards() {
     const container = document.getElementById('problems-container');
     container.innerHTML = '';
@@ -123,7 +129,7 @@ function generateCards() {
         container.innerHTML = `
             <div class="error-message">
                 <h2>No problems found</h2>
-                <p>Unable to load any problems. Please make sure you're running a local server (e.g. <code>python -m http.server</code>) and that <code>config/problems.json</code> exists.</p>
+                <p>Please make sure you're running a server and that the workflow has generated problems.json.</p>
             </div>
         `;
         return;
@@ -148,65 +154,64 @@ function generateCards() {
     filterCards();
 }
 
-// Setup search and difficulty filters
+// ==============================
+// Filters (search & difficulty)
+// ==============================
 function setupFilters() {
     const searchInput = document.getElementById('search');
     const difficultySelect = document.getElementById('difficulty');
 
-    searchInput.addEventListener('input', (e) => {
+    searchInput.addEventListener('input', e => {
         currentFilter.search = e.target.value.toLowerCase();
         filterCards();
     });
 
-    difficultySelect.addEventListener('change', (e) => {
+    difficultySelect.addEventListener('change', e => {
         currentFilter.difficulty = e.target.value;
         filterCards();
     });
 }
 
-// Filter cards based on search and difficulty
 function filterCards() {
     const cards = document.querySelectorAll('.problem-card');
 
     cards.forEach(card => {
         const title = card.querySelector('h3').textContent.toLowerCase();
-        const tags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
+        const tags = Array.from(card.querySelectorAll('.tag')).map(t => t.textContent.toLowerCase());
         const difficulty = card.querySelector('.difficulty').textContent;
 
         const matchesSearch = !currentFilter.search ||
             title.includes(currentFilter.search) ||
             tags.some(tag => tag.includes(currentFilter.search));
 
-        const matchesDifficulty = !currentFilter.difficulty ||
-            difficulty === currentFilter.difficulty;
+        const matchesDifficulty = !currentFilter.difficulty || difficulty === currentFilter.difficulty;
 
         card.style.display = (matchesSearch && matchesDifficulty) ? 'block' : 'none';
     });
 }
 
-// Setup dark mode toggle
+// ==============================
+// Dark mode toggle
+// ==============================
 function setupDarkMode() {
     const toggle = document.getElementById('dark-mode-toggle');
-
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light');
-    }
+    if (savedTheme === 'light') document.body.classList.add('light');
 
     toggle.addEventListener('click', () => {
         document.body.classList.toggle('light');
-        const currentTheme = document.body.classList.contains('light') ? 'light' : 'dark';
-        localStorage.setItem('theme', currentTheme);
+        localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
     });
 }
 
-// Problem page initialization
+// ==============================
+// PROBLEM PAGE FUNCTIONS
+// ==============================
 function initProblemPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const problemName = urlParams.get('name');
-
     if (!problemName) {
-        document.getElementById('markdown-content').innerHTML = '<p>Problem not found. Please provide a valid problem name.</p>';
+        document.getElementById('markdown-content').innerHTML = '<p>Problem not found.</p>';
         return;
     }
 
@@ -215,7 +220,6 @@ function initProblemPage() {
     setupCopyButton();
 }
 
-// Load and render problem content
 async function loadProblem(name) {
     try {
         const mdResponse = await fetch(`${BASE_PATH}content/${name}.md`);
@@ -223,68 +227,60 @@ async function loadProblem(name) {
         const mdText = await mdResponse.text();
 
         const frontmatter = parseFrontmatter(mdText);
+        document.getElementById('problem-title').textContent = frontmatter.title || name;
+        const diffEl = document.getElementById('difficulty');
+        diffEl.textContent = frontmatter.difficulty || '';
+        diffEl.className = `difficulty ${frontmatter.difficulty || ''}`;
+        document.getElementById('tags').innerHTML = (frontmatter.tags || []).map(t => `<span class="tag">${t}</span>`).join('');
 
-        document.getElementById('problem-title').textContent = frontmatter.title || 'Untitled Problem';
-        const difficultyEl = document.getElementById('difficulty');
-        difficultyEl.textContent = frontmatter.difficulty || '';
-        difficultyEl.className = `difficulty ${frontmatter.difficulty || ''}`;
-
-        const tagsContainer = document.getElementById('tags');
-        tagsContainer.innerHTML = (frontmatter.tags || []).map(tag => `<span class="tag">${tag}</span>`).join('');
-
-        const contentStartIndex = mdText.indexOf('---', mdText.indexOf('---') + 1) + 3;
-        const markdownContent = mdText.substring(contentStartIndex).trim();
+        const fmEnd = mdText.indexOf('---', mdText.indexOf('---') + 1);
+        const markdownContent = fmEnd !== -1 ? mdText.substring(fmEnd + 3).trim() : mdText;
         document.getElementById('markdown-content').innerHTML = marked.parse(markdownContent);
 
-        const codeResponse = await fetch(`${BASE_PATH}solutions/${name}.go`);
-        if (!codeResponse.ok) throw new Error(`Failed to fetch code: ${codeResponse.status}`);
-        const codeText = await codeResponse.text();
+        const codeResp = await fetch(`${BASE_PATH}solutions/${name}.go`);
+        if (!codeResp.ok) throw new Error(`Failed to fetch code: ${codeResp.status}`);
+        const codeText = await codeResp.text();
 
         const codeBlock = document.getElementById('code-block');
         codeBlock.textContent = codeText;
         codeBlock.className = 'language-go';
-
         Prism.highlightElement(codeBlock);
 
-    } catch (error) {
-        console.error('Error loading problem:', error);
-        document.getElementById('markdown-content').innerHTML = '<p>Sorry, there was an error loading the problem content.</p>';
+    } catch (err) {
+        console.error(err);
+        document.getElementById('markdown-content').innerHTML = '<p>Error loading problem.</p>';
         document.getElementById('code-block').textContent = '// Error loading code';
     }
 }
 
+// ==============================
 // Back button
+// ==============================
 function setupBackButton() {
     const backButton = document.getElementById('back-button');
-    backButton.addEventListener('click', () => {
-        window.history.back();
-    });
+    backButton.addEventListener('click', () => window.history.back());
 }
 
-// Copy to clipboard
+// ==============================
+// Copy code button
+// ==============================
 function setupCopyButton() {
     const copyButton = document.getElementById('copy-button');
     copyButton.addEventListener('click', async () => {
         const codeBlock = document.getElementById('code-block');
-        const code = codeBlock.textContent;
-
         try {
-            await navigator.clipboard.writeText(code);
-            const originalText = copyButton.textContent;
+            await navigator.clipboard.writeText(codeBlock.textContent);
+            const original = copyButton.textContent;
             copyButton.textContent = 'Copied!';
             copyButton.disabled = true;
-            setTimeout(() => {
-                copyButton.textContent = originalText;
-                copyButton.disabled = false;
-            }, 2000);
-        } catch (error) {
-            console.error('Failed to copy code:', error);
-            const textArea = document.createElement('textarea');
-            textArea.value = code;
-            document.body.appendChild(textArea);
-            textArea.select();
+            setTimeout(() => { copyButton.textContent = original; copyButton.disabled = false; }, 2000);
+        } catch (err) {
+            const ta = document.createElement('textarea');
+            ta.value = codeBlock.textContent;
+            document.body.appendChild(ta);
+            ta.select();
             document.execCommand('copy');
-            document.body.removeChild(textArea);
+            document.body.removeChild(ta);
             copyButton.textContent = 'Copied!';
             setTimeout(() => copyButton.textContent = 'Copy Code', 2000);
         }
