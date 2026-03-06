@@ -2,6 +2,8 @@
   "problems": [
     "freq-counter-map",
     "swap-without-temp",
-    "two-sum"
+    "two-sum",
+    "goroutine_print_numbers",
+    "waitgroup_multiple_goroutines"
   ]
 }
