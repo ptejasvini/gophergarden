@@ -32,9 +32,10 @@ jobs:
           mkdir -p _site
           # Copy root HTML, CSS, JS files
           cp *.html *.css *.js _site/
-          # Copy content and solutions directories
+          # Copy content, solutions, and config directories
           cp -r content _site/
           cp -r solutions _site/
+          cp -r config _site/
           # Create .nojekyll for GitHub Pages
           touch _site/.nojekyll
           # List what we're deploying

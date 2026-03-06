@@ -2,8 +2,16 @@
 let problems = [];
 let currentFilter = { search: '', difficulty: '' };
 
-// Base path for GitHub Pages compatibility
-const BASE_PATH = './'; // Adjust if using a subfolder
+// Detect base path dynamically
+const BASE_PATH = (function() {
+    const pathParts = window.location.pathname.split('/');
+    // If running on GitHub Pages (repo path included), use first 2 parts: ['', 'repo-name', ...]
+    if (window.location.hostname.includes('github.io')) {
+        return `/${pathParts[1]}/`;
+    }
+    // Otherwise, local server or root domain
+    return './';
+})();
 
 // Check which page we're on
 const isIndexPage = document.getElementById('problems-container') !== null;
@@ -124,7 +132,7 @@ function generateCards() {
     problems.forEach(problem => {
         const card = document.createElement('a');
         card.className = 'problem-card';
-        card.href = `problem.html?name=${problem.name}`;
+        card.href = `${BASE_PATH}problem.html?name=${problem.name}`;
 
         card.innerHTML = `
             <h3>${problem.title}</h3>
