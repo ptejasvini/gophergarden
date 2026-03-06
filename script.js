@@ -14,10 +14,30 @@ if (isIndexPage) {
 }
 
 // Index page initialization
-function initIndexPage() {
-    loadProblems();
+async function initIndexPage() {
+    try {
+        await loadProblems();
+    } catch (error) {
+        showLoadError(error);
+    }
     setupDarkMode();
     setupFilters();
+}
+
+function showLoadError(error) {
+    console.error('Failed to load problems:', error);
+
+    const container = document.getElementById('problems-container');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="error-message">
+            <h2>Unable to load problems</h2>
+            <p>It looks like the site is being opened directly from the file system. To load the problem list, run a local web server (for example:</p>
+            <pre><code>python -m http.server</code></pre>
+            <p>Then open <code>http://localhost:8000</code> in your browser.</p>
+        </div>
+    `;
 }
 
 // Load problems from markdown files
@@ -89,6 +109,16 @@ function parseFrontmatter(text) {
 function generateCards() {
     const container = document.getElementById('problems-container');
     container.innerHTML = '';
+
+    if (problems.length === 0) {
+        container.innerHTML = `
+            <div class="error-message">
+                <h2>No problems found</h2>
+                <p>Unable to load any problems. Please make sure you're running a local server (e.g. <code>python -m http.server</code>) and that <code>config/problems.json</code> exists.</p>
+            </div>
+        `;
+        return;
+    }
 
     problems.forEach(problem => {
         const card = document.createElement('a');
