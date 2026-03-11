@@ -2,7 +2,8 @@
 title: Prototype Design Pattern
 difficulty: Medium
 tags: [golang, design-pattern, prototype]
------------------------------------------
+---
+
 
 ## Problem Description
 

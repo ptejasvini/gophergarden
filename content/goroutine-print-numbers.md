@@ -1,8 +1,7 @@
-
 ---
 title: Print Number Routine
 difficulty: Easy
-tags: Goroutine 
+tags: [goroutine]
 ---
 
 ## Problem Description

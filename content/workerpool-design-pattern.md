@@ -2,7 +2,8 @@
 title: Worker Pool 
 difficulty: Easy
 tags: [goroutine, concurrency, waitgroup, channels]
----------------------------------------------------
+---
+
 
 ## Problem Description
 
