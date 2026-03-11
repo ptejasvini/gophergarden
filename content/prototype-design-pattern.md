@@ -1,6 +1,6 @@
 ---
-title: Prototype Design Pattern - Object Cloning
-difficulty: Easy
+title: Prototype Design Pattern
+difficulty: Medium
 tags: [golang, design-pattern, prototype]
 -----------------------------------------
 

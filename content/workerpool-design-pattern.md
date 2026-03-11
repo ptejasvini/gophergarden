@@ -1,5 +1,5 @@
 ---
-title: Worker Pool with WaitGroup
+title: Worker Pool 
 difficulty: Easy
 tags: [goroutine, concurrency, waitgroup, channels]
 ---------------------------------------------------
